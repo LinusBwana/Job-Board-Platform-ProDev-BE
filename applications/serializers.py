@@ -5,11 +5,11 @@ from jobs.serializers import JobSerializer
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['job', 'cover_letter', 'resume', 'additional_documents', 'applicant',
-                  'experience_years', 'expected_salary', 'availability_date', 'applied_on']
-        read_only_fields = ['reviewed_by', 'reviewed_at', 'status', 'id']
+        fields = ['id', 'job', 'cover_letter', 'resume', 'additional_documents', 'applicant', 
+                  'experience_years', 'expected_salary', 'availability_date']
+        read_only_fields = ['reviewed_by', 'reviewed_at', 'status', 'applied_on']
 
-class ApplicationHistorySerializer(serializers.ModelSerializer):
+class ApplicantHistorySerializer(serializers.ModelSerializer):
     job = JobSerializer(read_only=True)
     job_title = serializers.CharField(source='job.title', read_only=True)
     company_name = serializers.CharField(source='job.company.name', read_only=True)
