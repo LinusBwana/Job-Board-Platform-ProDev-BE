@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Application
+from .models import ApplyJob
 
-class ApplicationAdmin(admin.ModelAdmin):
+class ApplyJobAdmin(admin.ModelAdmin):
     list_display = ['job', 'status']
-admin.site.register(Application, ApplicationAdmin)
+admin.site.register(ApplyJob, ApplyJobAdmin)

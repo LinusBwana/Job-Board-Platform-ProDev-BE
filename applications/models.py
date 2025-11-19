@@ -10,7 +10,7 @@ def user_directory_path(instance, filename):
     return f'application_documents/user_{instance.applicant.id}/{filename}'
 
 # Create your models here.
-class Application(models.Model):
+class ApplyJob(models.Model):
     status_choices = [
         ('pending', 'Pending'),
         ('reviewed', 'Reviewed'),
@@ -24,7 +24,7 @@ class Application(models.Model):
         unique=True,
         editable=False,
     )
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='apply_job')
     applicant = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.CharField(
         choices=status_choices,
@@ -71,7 +71,7 @@ class Application(models.Model):
 class ApplicationHistory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, 
                           editable=False, unique=True)
-    application = models.ForeignKey(Application,
+    application = models.ForeignKey(ApplyJob,
                                     on_delete=models.CASCADE,
                                     related_name='status_history')
     status = models.CharField(max_length=50)

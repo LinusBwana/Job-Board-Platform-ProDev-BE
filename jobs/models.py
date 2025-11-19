@@ -151,7 +151,7 @@ class Job(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='jobs')
-    category = models.ForeignKey(Industry, on_delete=models.CASCADE, related_name='jobs')
+    industry = models.ForeignKey(Industry, on_delete=models.CASCADE, related_name='jobs')
     location = models.ManyToManyField(Location, related_name='jobs')
     job_type = models.CharField(
         choices=job_type_choices,
@@ -171,7 +171,7 @@ class Job(models.Model):
                                      blank=True, null=True)
     salary_max = models.DecimalField(max_digits=10, decimal_places=2,
                                      blank=True, null=True)
-    salary_currency = models.CharField(max_length=3, default='USD')
+    salary_currency = models.CharField(max_length=3, default='Ksh')
     is_salary_visible = models.BooleanField(default=True)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
@@ -185,12 +185,12 @@ class Job(models.Model):
         ordering = ['-posted_on']
         indexes = [
             models.Index(fields=['title']),
-            models.Index(fields=['category']),
+            models.Index(fields=['industry']),
             models.Index(fields=['job_type']),
             models.Index(fields=['experience_level']),
             models.Index(fields=['company']),
             models.Index(fields=['is_active']),
-            models.Index(fields=['is_active', 'category']),
+            models.Index(fields=['is_active', 'industry']),
         ]
 
     def save(self, *args, **kwargs):
@@ -198,7 +198,7 @@ class Job(models.Model):
             base_slug = slugify(f"{self.title}-{self.company.name}")
             slug = base_slug
             # Handle duplicate slugs
-            while Job.objects.filter(slug=self.slug).exists():
+            while Job.objects.filter(slug=slug).exists():
                 random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
                 slug = f"{base_slug}-{random_str}"
             self.slug = slug

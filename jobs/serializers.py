@@ -19,8 +19,13 @@ class CompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'slug', 'is_verified', 'created_at', 'updated_at']
 
-class JobSerializer(serializers.ModelSerializer):
+class PostJobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'
-        read_only_fields = ['id', 'slug', 'posted_on', 'updated_on']
+        read_only_fields = ['id', 'slug', 'industry', 'posted_by', 'posted_on', 'updated_on']
+
+class AvailableJobsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = '__all__'

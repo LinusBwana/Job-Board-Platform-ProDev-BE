@@ -4,6 +4,7 @@ from .serializers import UserSerializer, RegisterUserSerializer, LoginSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -14,13 +15,13 @@ class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
+    @swagger_auto_schema(request_body=LoginSerializer)
 
     def create(self, request, *args, **kwargs):
         """
         Handle user login (POST request)
         """
         serializer = LoginSerializer(data=request.data)
-
         if serializer.is_valid():
             # Valid login, returning access and refresh tokens
             user = serializer.validated_data['user']

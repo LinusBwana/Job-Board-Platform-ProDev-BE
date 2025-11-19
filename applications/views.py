@@ -1,27 +1,24 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import ApplicationSerializer, ApplicantHistorySerializer, EmployerApplicationSerializer
-from .models import Application
+from .serializers import ApplyJobSerializer, ApplicantHistorySerializer, EmployerApplicationSerializer
+from .models import ApplicationHistory, ApplyJob
 from .permissions import IsAuthenticatedToApply, IsApplicantOwner, IsJobOwner
 from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
-class ApplicationViewset(viewsets.ModelViewSet):
-    """
-    Main application viewset
-    - Anyone can view applications (GET)
-    - Only authenticated users can create applications (POST)
-    """
-    queryset = Application.objects.all()
-    serializer_class = ApplicationSerializer
-    # permission_classes = [IsAuthenticatedToApply]
+class ApplyJobViewset(viewsets.ModelViewSet):
+    # Only authenticated users can apply for jobs (POST)
+    queryset = ApplyJob.objects.all()
+    serializer_class = ApplyJobSerializer
+    permission_classes = [IsAuthenticatedToApply]
+    http_method_names = ['post']
 
     def perform_create(self, serializer):
         # Automatically set the applicant to the logged-in user
         serializer.save(applicant=self.request.user)
 
 # For Job Seekers - "My Applications"
-class MyApplicationViewset(viewsets.ReadOnlyModelViewSet):
+class MyApplicationHistoryViewset(viewsets.ReadOnlyModelViewSet):
     """
     For Job Seekers - "My Applications"
     - Only authenticated users can access
@@ -31,25 +28,31 @@ class MyApplicationViewset(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsApplicantOwner]
 
     def get_queryset(self):
-        return Application.objects.filter(
+        if getattr(self, 'swagger_fake_view', False):
+            return ApplyJob.objects.none()
+        
+        return ApplyJob.objects.filter(
             applicant=self.request.user
-        ).select_related('job', 'job__company').order_by('-applied_on')
+        ).select_related('job', 'job__company').order_by('applied_on')
 
 
 # For Employers - "Applications to My Jobs"
-class JobApplicationsViewset(viewsets.ModelViewSet):
+class JobApplicationsHistoryViewset(viewsets.ModelViewSet):
     """
     For Employers - "Applications to My Jobs"
     - Only authenticated users can access
     - Employers can only see applications to jobs they posted
-    - Employers can update application status (PUT/PATCH)
+    - Employers can update application status obly
     """
     serializer_class = EmployerApplicationSerializer
     permission_classes = [IsAuthenticated, IsJobOwner]
     http_method_names = ['get', 'put', 'patch']
 
     def get_queryset(self):
-        return Application.objects.filter(
+        if getattr(self, 'swagger_fake_view', False):
+            return ApplyJob.objects.none()
+        
+        return ApplyJob.objects.filter(
             job__posted_by=self.request.user
         ).select_related('job', 'applicant').order_by('-applied_on')
 
