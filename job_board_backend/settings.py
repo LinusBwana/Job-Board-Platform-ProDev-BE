@@ -237,5 +237,5 @@ SWAGGER_SETTINGS = {
             'description': 'JWT Authorization header'
         }
     },
-    'DEFAULT_API_URL': 'https://job-board-platform-production-7536.up.railway.app',
+    'DEFAULT_API_URL': 'https://job-board-platform-production.up.railway.app',
 }
